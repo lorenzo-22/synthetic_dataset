@@ -38,7 +38,7 @@ def generate_data():
 
 def make_sample_labels(df):
     # Make true sample labels (group of the sample, here A and B made into 0s and 1s for standardization)
-    sample_labels = {sample: ("1" if sample.startswith('A') else '0') for sample in df.index}
+    sample_labels = {sample: ("1" if sample.startswith('A') else '0') for sample in df.T.index}
     sample_labels = df = pd.DataFrame.from_dict(sample_labels, orient='index', columns=['label'])
 
     return sample_labels
