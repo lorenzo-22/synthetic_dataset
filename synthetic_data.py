@@ -83,5 +83,5 @@ if __name__ == "__main__":
 
     # Save sample lables separately
     sample_labels = make_sample_labels(df_data)
-    labels_df.to_csv(sample_labels_file)
+    sample_labels.to_csv(sample_labels_file)
     print(f"Saved true sample labels to '{sample_labels_file}'")
