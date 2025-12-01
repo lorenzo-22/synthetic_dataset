@@ -62,7 +62,7 @@ if __name__ == "__main__":
     
     # Construct output file paths
     output_file = os.path.join(args.output_dir, f"{args.name}.synthetic_dataset.csv")
-    labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels_proteins.csv")
+    protein_labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels_proteins.csv")
     sample_labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels.csv")
     
     # Print summary to console
@@ -78,8 +78,8 @@ if __name__ == "__main__":
     
     # Save labels separately
     labels_df = df[['is_differentially_expressed']]
-    labels_df.to_csv(labels_file)
-    print(f"Saved true labels to '{labels_file}'")
+    labels_df.to_csv(protein_labels_file)
+    print(f"Saved true labels to '{protein_labels_file}'")
 
     # Save sample lables separately
     sample_labels = make_sample_labels(df_data)
