@@ -62,8 +62,8 @@ if __name__ == "__main__":
     
     # Construct output file paths
     output_file = os.path.join(args.output_dir, f"{args.name}.synthetic_dataset.csv")
-    labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels.csv")
-    sample_labels_file = os.path.join(args.output_dir, f"{args.name}.true_sample_labels.csv")
+    labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels_proteins.csv")
+    sample_labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels.csv")
     
     # Print summary to console
     print(f"\nData Generated Successfully!")
