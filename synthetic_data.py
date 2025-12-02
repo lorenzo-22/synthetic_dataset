@@ -23,8 +23,38 @@ def generate_data():
     # 4. Create label tracker (optional, but good for validation)
     true_labels = np.zeros(proteins_n, dtype=int)
     true_labels[:200] = 1
+
+    # 5) Instrument noise (Gaussian, proportional to protein variability)
+    # Mass spectrometers introduce random fluctuations in measured intensities. The noise is 15% of each proteins variability (adds jitter to values).
+    noise_A = np.random.normal(loc=0.0, scale=0.15 * A.std(axis=1, keepdims=True), size=A.shape)
+    noise_B = np.random.normal(loc=0.0, scale=0.15 * B.std(axis=1, keepdims=True), size=B.shape)
+    A += noise_A
+    B += noise_B
     
-    # 5. formatting into DataFrame
+    # 2) Missing values (missing not at random=bias toward low-abundance; plus some missing at random=due to sampling)
+    # Compute global 25th percentile to bias toward low values
+    q25_A = np.nanpercentile(A, 25)
+    q25_B = np.nanpercentile(B, 25)
+    
+    # Missing not at random: more missing when below 25th percentile
+    mnar_A = (A < q25_A) & (np.random.rand(*A.shape) < 0.25)  # ~25% dropout low-abundance
+    mnar_B = (B < q25_B) & (np.random.rand(*B.shape) < 0.25)
+    
+    # Missing at random: random missing everywhere (~5%)
+    mar_A = np.random.rand(*A.shape) < 0.05
+    mar_B = np.random.rand(*B.shape) < 0.05
+    
+    # Set these to NAN
+    A[mnar_A | mar_A] = np.nan
+    B[mnar_B | mar_B] = np.nan
+    
+    # 3) Batch effects (systematic shift in half of group B samples)
+    # Here, we simulate an instrument drift as +0.5 in B samples 3 to5
+    batch_labels = np.array(["A"] * nA + ["B"] * nB)
+    batch_shift_B = np.array([0.0, 0.0, 0.0, 0.5, 0.5, 0.5])
+    B += batch_shift_B 
+    
+    # 6. formatting into DataFrame
     counts = np.hstack([A, B])
     samples = [f"A{i}" for i in range(nA)] + [f"B{i}" for i in range(nB)]
     proteins = [f"Prot{i}" for i in range(proteins_n)]
@@ -32,7 +62,7 @@ def generate_data():
     df = pd.DataFrame(counts, index=proteins, columns=samples)
 
     # Add the truth label as a column for reference (optional)
-    df['label'] = true_labels
+    df['is_differentially_expressed'] = true_labels
     
     return df
 
@@ -72,16 +102,16 @@ if __name__ == "__main__":
     print(df.head())
     
     # Save main dataset to CSV (without labels column)
-    df_data = df.drop(columns=['label'])
+    df_data = df.drop(columns=['is_differentially_expressed'])
     df_data.to_csv(output_file)
     print(f"\nSaved dataset to '{output_file}'")
     
     # Save labels separately
-    labels_df = df[['label']]
-    labels_df.to_csv(protein_labels_file, header=False)
+    labels_df = df[['is_differentially_expressed']]
+    labels_df.to_csv(protein_labels_file)
     print(f"Saved true labels to '{protein_labels_file}'")
 
     # Save sample lables separately
     sample_labels = make_sample_labels(df_data)
-    sample_labels.to_csv(sample_labels_file, header=False)
+    sample_labels.to_csv(sample_labels_file)
     print(f"Saved true sample labels to '{sample_labels_file}'")
