@@ -72,12 +72,12 @@ if __name__ == "__main__":
     print(df.head())
     
     # Save main dataset to CSV (without labels column)
-    df_data = df.drop(columns=['is_differentially_expressed'])
+    df_data = df.drop(columns=['label'])
     df_data.to_csv(output_file)
     print(f"\nSaved dataset to '{output_file}'")
     
     # Save labels separately
-    labels_df = df[['is_differentially_expressed']]
+    labels_df = df[['label']]
     labels_df.to_csv(protein_labels_file, header=False)
     print(f"Saved true labels to '{protein_labels_file}'")
 
