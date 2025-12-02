@@ -30,11 +30,18 @@ def generate_data():
     proteins = [f"Prot{i}" for i in range(proteins_n)]
     
     df = pd.DataFrame(counts, index=proteins, columns=samples)
-    
+
     # Add the truth label as a column for reference (optional)
     df['is_differentially_expressed'] = true_labels
     
     return df
+
+def make_sample_labels(df):
+    # Make true sample labels (group of the sample, here A and B made into 0s and 1s for standardization)
+    sample_labels = {sample: ("1" if sample.startswith('A') else '0') for sample in df.T.index}
+    sample_labels = df = pd.DataFrame.from_dict(sample_labels, orient='index', columns=['label'])
+
+    return sample_labels
 
 if __name__ == "__main__":
     # Setup Argument Parser for OmniBenchmark
@@ -55,7 +62,8 @@ if __name__ == "__main__":
     
     # Construct output file paths
     output_file = os.path.join(args.output_dir, f"{args.name}.synthetic_dataset.csv")
-    labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels.csv")
+    protein_labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels_proteins.csv")
+    sample_labels_file = os.path.join(args.output_dir, f"{args.name}.true_labels.csv")
     
     # Print summary to console
     print(f"\nData Generated Successfully!")
@@ -70,5 +78,10 @@ if __name__ == "__main__":
     
     # Save labels separately
     labels_df = df[['is_differentially_expressed']]
-    labels_df.to_csv(labels_file)
-    print(f"Saved true labels to '{labels_file}'")
+    labels_df.to_csv(protein_labels_file)
+    print(f"Saved true labels to '{protein_labels_file}'")
+
+    # Save sample lables separately
+    sample_labels = make_sample_labels(df_data)
+    sample_labels.to_csv(sample_labels_file)
+    print(f"Saved true sample labels to '{sample_labels_file}'")
