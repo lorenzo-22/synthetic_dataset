@@ -103,7 +103,7 @@ if __name__ == "__main__":
     
     # Save main dataset to CSV (without labels column)
     df_data = df.drop(columns=['is_differentially_expressed'])
-    df_data.to_csv(output_file)
+    df_data.to_csv(output_file, na_rep='NaN')
     print(f"\nSaved dataset to '{output_file}'")
     
     # Save labels separately
