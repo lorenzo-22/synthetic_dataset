@@ -60,6 +60,17 @@ def generate_data():
     proteins = [f"Prot{i}" for i in range(proteins_n)]
     
     df = pd.DataFrame(counts, index=proteins, columns=samples)
+    
+    imputed_df = df.copy()
+    for col in imputed_df.columns:
+	col_values = imputed_df[col].values
+	if np.isnan(col_values).any():
+		low_q = np.nanpercentile(col_values, 1)
+		# add small jitter to avoid identical values
+		jitter = np.random.normal(loc=0.0, scale=0.05, size=col_values.shape)
+		col_values[np.isnan(col_values)] = low_q + jitter[np.isnan(col_values)]
+		imputed_df[col] = col_values
+    df = imputed_df.copy()
 
     # Add the truth label as a column for reference (optional)
     df['is_differentially_expressed'] = true_labels
