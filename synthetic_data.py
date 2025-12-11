@@ -18,7 +18,7 @@ def generate_data():
     B = np.random.normal(mu, sigma, size=(proteins_n, nB))
     
     # 3. Inject signal (+1 log2 effect) into first 200 proteins of Group B
-    B[:200] += 1.0
+    A[:200] += 1.0
     
     # 4. Create label tracker (optional, but good for validation)
     true_labels = np.zeros(proteins_n, dtype=int)
@@ -79,7 +79,7 @@ def generate_data():
 
 def make_sample_labels(df):
     # Make true sample labels (group of the sample, here A and B made into 0s and 1s for standardization)
-    sample_labels = {sample: ("1" if sample.startswith('B') else '0') for sample in df.T.index}
+    sample_labels = {sample: ("1" if sample.startswith('A') else '0') for sample in df.T.index}
     sample_labels = df = pd.DataFrame.from_dict(sample_labels, orient='index', columns=['label'])
 
     return sample_labels
